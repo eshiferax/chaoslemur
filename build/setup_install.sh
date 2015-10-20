@@ -12,4 +12,3 @@ sudo apt-get update
 sudo apt-get purge lxc-docker*
 
 sudo apt-get install docker-engine
-sudo docker run hello-world

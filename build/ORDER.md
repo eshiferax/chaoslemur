@@ -1,5 +1,6 @@
-setup_install.sh
-prepare_images.sh
-build_and_run_containers.sh
-network_containers.sh
+
+* setup_install.sh
+* prepare_images.sh
+* build_and_run_containers.sh
+* network_containers.sh
 

@@ -8,5 +8,6 @@
 
 bash -c "curl https://raw.githubusercontent.com/jpetazzo/pipework/master/pipework" > pipework
 
-sudo ./pipework br0 R1
-sudo ./pipework br0 R2
+chmod +x pipework
+./pipework br0 R1
+./pipework br0 R2

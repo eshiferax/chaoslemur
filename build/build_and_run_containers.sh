@@ -6,6 +6,9 @@
 # http://anton-baranov.blogspot.com/2015/03/using-quagga-with-docker-containers.html
 ############################
 
+#Dependencies
+sudo apt-get install acl
+
 #Build volumes for containers
 mkdir -p ~/volumes/quagga/R1
 mkdir -p ~/volumes/quagga/R2
