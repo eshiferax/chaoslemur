@@ -7,8 +7,8 @@
 ############################
 
 #Build volumes for containers
-mkdir ~/volumes/quagga/R1
-mkdir ~/volumes/quagga/R2
+mkdir -p ~/volumes/quagga/R1
+mkdir -p ~/volumes/quagga/R2
 
 sudo setfacl -R -m u:100:rwx ~/volumes/quagga
 sudo setfacl -R -m:g:101:rwx ~/volumes/quagga
