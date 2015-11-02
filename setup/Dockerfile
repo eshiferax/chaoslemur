@@ -1,0 +1,43 @@
+# Use phusion/baseimage as base image. To make your builds
+# reproducible, make sure you lock down to a specific version, not
+# to `latest`! See
+# https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
+# for a list of version numbers.
+FROM phusion/baseimage:0.9.16
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
+
+# Tell debconf to run in non-interactive mode
+ENV DEBIAN_FRONTEND noninteractive
+
+
+# Update the source list for appropriate repository, trusty 14.04 LTS, in this case.
+# Generated from:
+# https://wiki.ubuntu.com/DevelopmentCodeNames
+# http://repogen.simplylinux.ch/
+
+RUN echo "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" >> /etc/apt/sources.list
+RUN echo "deb-src http://fr.archive.ubuntu.com/ubuntu/ trusty main universe" >> /etc/apt/sources.list
+RUN echo "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-security main" >> /etc/apt/sources.list
+RUN echo "deb http://fr.archive.ubuntu.com/ubuntu/ trusty-updates main" >> /etc/apt/sources.list
+RUN echo "deb-src http://fr.archive.ubuntu.com/ubuntu/ trusty-security main universe" >> /etc/apt/sources.list
+RUN echo "deb-src http://fr.archive.ubuntu.com/ubuntu/ trusty-updates main universe" >> /etc/apt/sources.list
+RUN apt-get update && apt-get install -y wget git
+
+# Enable SSH loging provided by Baseimage docker and regenerate keys
+RUN rm -f /etc/service/sshd/down
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+RUN mkdir -p /root/.ssh
+ADD id_rsa.pub /tmp/id_rsa.pub
+RUN cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys && rm -f /tmp/id_rsa.pub
+
+
+# Miscellaneous tools
+RUN sudo apt-get install -y iperf inetutils-traceroute iputils-tracepath \
+mtr dnsutils sip-tester build-essential sip-tester tcpdump packeth libasound2-dev libpcap-dev libssl-dev
+
+# Install IPv6-THC tool
+RUN git clone https://github.com/vanhauser-thc/thc-ipv6
+WORKDIR thc-ipv6/
+RUN make && make install
