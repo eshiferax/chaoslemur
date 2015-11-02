@@ -1,3 +1,4 @@
+Order of scripts to run:
 
 * setup_install.sh
 * prepare_images.sh
