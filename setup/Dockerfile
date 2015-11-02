@@ -1,3 +1,8 @@
+##Base dockerfile for Quagga routers
+# from basic ubuntu image w/networking tools @ https://community.gns3.com/community/connect/community-blog/blog/2015/06/09/running-quagga-container-with-gns3
+# Emmanuel Shiferaw
+# Davis Gossage
+
 # Use phusion/baseimage as base image. To make your builds
 # reproducible, make sure you lock down to a specific version, not
 # to `latest`! See
@@ -36,6 +41,7 @@ RUN cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys && rm -f /tmp/id_rsa.pub
 # Miscellaneous tools
 RUN sudo apt-get install -y iperf inetutils-traceroute iputils-tracepath \
 mtr dnsutils sip-tester build-essential sip-tester tcpdump packeth libasound2-dev libpcap-dev libssl-dev
+RUN sudo apt-get install -y libnetfilter-queue-dev
 
 # Install IPv6-THC tool
 RUN git clone https://github.com/vanhauser-thc/thc-ipv6
