@@ -8,6 +8,12 @@ Uses [Quagga](http://www.nongnu.org/quagga/) for building virtual network, [Dock
 ## How to Build/Run
   * As this is still an extremely early-stage project, we don't have any instructions yet. Stay tuned.
 
+## updates
+
+ * (11/2) - switched over to using ubuntu images and a different script structure to get everything ready to be networked. Still
+	    using pipework - next step is to add a piece in the 'setup.sh' script to get the container IDs of the new containers
+            and give them to 'startquagga.sh', which will use them as arguments for pipework.
+
 ## Current Features
   * Scripts for configuring and running docker containers with quagga, able to speak BGP to each other.
 
