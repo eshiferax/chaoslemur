@@ -1,18 +1,21 @@
 #!/bin/bash
-
+#
+# Original code from gns3 community post on running quagga on docker containers
 # AJ NOURI: cciethebeginning.wordpress.com
-# Email: ajn.bin@gmail.com
+# https://community.gns3.com/community/connect/community-blog/blog/2015/06/09/running-quagga-container-with-gns3
 
 # $1 = Image tag
 # $2 = Container name
 
 function networking(){
+   #TODO: add area to 'inject' quagga installation/setup/BGP conf script into container 
+
    # $1 : The 1st argument passed to the function, container ID.
    # Configure additional interfaces on the container:
    # - host bridge to  which the interfaces is connected
    # - container interface IP
    # - gateway: the last configured gateway is used
-   echo "Container networking... \n"
+   echo "Container networking for BGP... \n"
    while true; do
        read -p 'Continue? [Yy] [Nn]' NET
        case $NET in
