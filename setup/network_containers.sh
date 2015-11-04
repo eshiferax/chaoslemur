@@ -8,8 +8,6 @@
 # $2 = Container name
 
 function networking(){
-   #TODO: add area to 'inject' quagga installation/setup/BGP conf script into container 
-
    # $1 : The 1st argument passed to the function, container ID.
    # Configure additional interfaces on the container:
    # - host bridge to  which the interfaces is connected

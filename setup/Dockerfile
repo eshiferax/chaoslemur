@@ -37,6 +37,12 @@ RUN mkdir -p /root/.ssh
 ADD id_rsa.pub /tmp/id_rsa.pub
 RUN cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys && rm -f /tmp/id_rsa.pub
 
+# Install Quagga
+RUN sudo apt-get install -y quagga
+
+# Install supervisord
+RUN sudo apt-get install -y  supervisor
+RUN mkdir -p /var/log/supervisor
 
 # Miscellaneous tools
 RUN sudo apt-get install -y iperf inetutils-traceroute iputils-tracepath \
