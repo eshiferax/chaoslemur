@@ -18,6 +18,10 @@ Uses [Quagga](http://www.nongnu.org/quagga/) for building virtual network, [Dock
             to cleanly automate the different 'experiments'.
             THEN need to add Quagga as git sub-module and get to work on failure injection.
 
+ * (11/3) - Docker built-in [advanced networking](http://blog.docker.com/2015/11/docker-1-9-production-ready-swarm-multi-host-networking/) is now
+            production ready and in Docker 1.9!!! So I don't think pipework is necessary anymore, but we'll see. The current
+            Dockerfile and setup_containers.sh script work to prepare the host environment, build image from file, and start one container. 
+
 ## Current Progress
   * Scripts for configuring and running docker containers with quagga, able to speak BGP to each other.
 

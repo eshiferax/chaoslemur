@@ -40,6 +40,10 @@ RUN cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys && rm -f /tmp/id_rsa.pub
 # Install Quagga
 RUN sudo apt-get install -y quagga
 
+# Expose ports
+EXPOSE 179 2601 2605
+
+
 # Install supervisord
 RUN sudo apt-get install -y  supervisor
 RUN mkdir -p /var/log/supervisor
