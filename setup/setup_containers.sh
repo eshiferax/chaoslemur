@@ -8,7 +8,7 @@
 ##Stop, remove ALL existing containers
 # NOTE: may take a bit of time
 sudo docker stop $(sudo docker ps -aq)
-sudo docker rm $(sudo docer ps -aq)
+sudo docker rm $(sudo docker ps -aq)
 
 ###
 # install pipework, lxterminal

@@ -37,23 +37,44 @@ RUN mkdir -p /root/.ssh
 ADD id_rsa.pub /tmp/id_rsa.pub
 RUN cat /tmp/id_rsa.pub >> /root/.ssh/authorized_keys && rm -f /tmp/id_rsa.pub
 
+#make quagga service dir
+RUN mkdir /etc/service/quagga
+
 # Install Quagga
-RUN sudo apt-get install -y quagga
+RUN sudo apt-get install -y quagga telnet
 
-# Expose ports
-EXPOSE 179 2601 2605
+# Expose ports that quagga, BGP use (179 is bgp, rest are quagga mngmt)
+EXPOSE 179 2601 2602 2603 2604 2605
 
+# enable daemons
+# Add logic to only enable bgpd and zebra
+RUN sed -i 's/=no/=yes/g' /etc/quagga/daemons
+
+# copy the default configs for the routing daemons
+# TODO: replace this with using ADD for local files
+ADD conf/bgpd.conf /etc/quagga/bgpd.conf
+ADD conf/babeld.conf /etc/quagga/babeld.conf
+
+#RUN echo VTYSH_PAGER=more >> /etc/environment
+#RUN echo export VTYSH_PAGER=more >> /etc/bash.bashrc
+
+ADD quagga.sh /etc/service/quagga/run
+CMD ["/etc/init.d/quagga","start"]
+#entrypoint ["/etc/init.d/quagga"]
+
+# Map a container directory to Docker host directory (not in the other direction)
+VOLUME /etc/quagga/
 
 # Install supervisord
-RUN sudo apt-get install -y  supervisor
-RUN mkdir -p /var/log/supervisor
+#RUN sudo apt-get install -y  supervisor
+#RUN mkdir -p /var/log/supervisor
 
 # Miscellaneous tools
-RUN sudo apt-get install -y iperf inetutils-traceroute iputils-tracepath \
-mtr dnsutils sip-tester build-essential sip-tester tcpdump packeth libasound2-dev libpcap-dev libssl-dev
-RUN sudo apt-get install -y libnetfilter-queue-dev
+#RUN sudo apt-get install -y iperf inetutils-traceroute iputils-tracepath \
+#mtr dnsutils sip-tester build-essential sip-tester tcpdump packeth libasound2-dev libpcap-dev libssl-dev
+#RUN sudo apt-get install -y libnetfilter-queue-dev
 
 # Install IPv6-THC tool
-RUN git clone https://github.com/vanhauser-thc/thc-ipv6
-WORKDIR thc-ipv6/
-RUN make && make install
+#RUN git clone https://github.com/vanhauser-thc/thc-ipv6
+#WORKDIR thc-ipv6/
+#RUN make && make install
