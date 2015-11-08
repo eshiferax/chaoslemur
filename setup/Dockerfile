@@ -47,11 +47,10 @@ RUN sudo apt-get install -y quagga telnet
 EXPOSE 179 2601 2602 2603 2604 2605
 
 # enable daemons
-# Add logic to only enable bgpd and zebra
-RUN sed -i 's/=no/=yes/g' /etc/quagga/daemons
+RUN sed -i 's/bgpd=no/bgpd=yes/g' /etc/quagga/daemons
+RUN sed -i 's/zebra=no/zebra=yes/g' /etc/quagga/daemons
 
 # copy the default configs for the routing daemons
-# TODO: replace this with using ADD for local files
 ADD conf/bgpd.conf /etc/quagga/bgpd.conf
 ADD conf/babeld.conf /etc/quagga/babeld.conf
 
