@@ -1,5 +1,11 @@
 #!/bin/bash
 #
+
+##LIKELY TO NO LONGER USE
+
+#USING DOCKER 1.9'S NETWORKS
+
+
 # Original code from gns3 community post on running quagga on docker containers
 # AJ NOURI: cciethebeginning.wordpress.com
 # https://community.gns3.com/community/connect/community-blog/blog/2015/06/09/running-quagga-container-with-gns3
