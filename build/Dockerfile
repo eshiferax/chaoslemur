@@ -53,6 +53,8 @@ RUN sed -i 's/zebra=no/zebra=yes/g' /etc/quagga/daemons
 # copy the default configs for the routing daemons
 ADD conf/bgpd.conf /etc/quagga/bgpd.conf
 ADD conf/babeld.conf /etc/quagga/babeld.conf
+ADD conf/zebra.conf /etc/quagga/zebra.conf
+ADD conf/vtysh.conf /etc/quagga/vtysh.conf
 
 #RUN echo VTYSH_PAGER=more >> /etc/environment
 #RUN echo export VTYSH_PAGER=more >> /etc/bash.bashrc
