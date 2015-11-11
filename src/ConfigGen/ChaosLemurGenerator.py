@@ -1,4 +1,10 @@
-### ChaosLemurGenerator
+#!/bin/python
+#ChaosLemurGenerator.py
+#Emmanuel Shiferaw
+#Davis Gossage
+
+import subprocess
+import json
 
 class ChaosLemurGenerator:
     
@@ -15,7 +21,7 @@ class ChaosLemurGenerator:
     # topology - desired layout of nodes
     # path - location to save new bgpd.conf files
     ###
-    def generateConfigs(num_routers, topology, path):
+    def generateConfigs(path):
 
         # Get portion of conf template listing router IP, neighbo
         with open ("bgpd.conf.template", "r") as tfile:
@@ -32,8 +38,8 @@ class ChaosLemurGenerator:
 
         ## TODO: Build bgpd.conf string for each router, save
         all_configs = []
-        for rt in range(1, num_routers+1):
-            curr_conf = buildConf(num_routers, rt)
+        for rt in range(1, self.num_routers+1):
+            curr_conf = buildConf(self.num_routers, rt)
             all_configs.append(curr_conf)
 
         print router_portion
@@ -42,6 +48,7 @@ class ChaosLemurGenerator:
     ###
     # Build bgpd.conf file from template for specific router number, given total number
     ###
+    @staticmethod
     def buildConf(num, curr):
         ##TODO: Implement
         return
@@ -49,5 +56,6 @@ class ChaosLemurGenerator:
     ###
     # Return simple "neighbor IP" string for given router number
     ###
+    @staticmethod
     def neighborString(subnet, no):
         return "neighbor " + subnet[:-1] + str(no)
