@@ -1,13 +1,18 @@
 #!/bin/python
-#ChaosLemurGenerator.py
+#chaosgen.py
 #Emmanuel Shiferaw
 #Davis Gossage
+# CS514: Computer Networks and Distributed Systems
+
+# Contains classes used to set up the ChaosLemur environment for experiments to be run
+
 
 import subprocess
 import json
+import datetime
 # import docker-py
 
-class ChaosLemurGenerator:
+class ChaosLemurConfigGenerator:
     
     def __init__(self, num_routers, topology):
         self.num_routers = num_routers
@@ -16,7 +21,12 @@ class ChaosLemurGenerator:
         self.bgpd_template = []
         self.subnet = ""
         loadTemplate() 
-       
+    
+    
+    def recycle(num_routers, topology):
+        self.num_routers = num_routers
+        self.topology = topology   
+    
     ###
     # Load bgpd.conf.template file from fs, extract portion describing self/neighbors
     ###
@@ -48,18 +58,39 @@ class ChaosLemurGenerator:
         for rt in range(1, self.num_routers+1):
             # topology_to_method
             curr_conf = buildTopologyPortionMesh(self.num_routers, rt, self.subnet)
-            all_configs.append(curr_conf)
+            all_configs.append((rt, curr_conf))
 
-        saveConfigs(all_configs, path)
-        print router_portion
-        print "Subnet: " + self.subnet
+        bgpd_confs = __makeConfigs(all_configs)
+
+    
+    ###
+    #
+    ###
+    def __makeContext(bgpd_confs):
+        root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("ChaosLemurContext")
+        if not os.path.exists(root_dir_name):
+            os.makedirs(root_dir_name)
+        
+        
 
     ###
     # Given list of neighbor-listing portions that contain topology info,
-    # builds 4 full
+    # builds 4 full bgpd.conf files (as lists of lines) , returns list of those lists
     ###
-    def __saveConfigs(list_of_configs, path):
-    
+    def __makeConfigs(list_of_portions):
+        all_bgpd = []
+        start_line = 16
+        router_line = 14
+        for tupl in list_of_configs:
+            router_statement = "router bgp " + self.subnet[:-1] + tupl[0]
+            cf_portion = tupl[1]
+            end_line = start_line + len(cf_portion) + 1
+            bgpd = self.bgpd_template
+            bgpd[router_line] = router_statement
+            bgpd[start_line:end_line] = cf_portion
+            all_bgpd.append(bgpd)
+
+        return all_bgpd
 
 
 
@@ -71,7 +102,7 @@ class ChaosLemurGenerator:
     def buildTopologyPortionMesh(num, curr, subnet):
         all_except_me = range(1, num+1)
         all_except_me.remove(curr)
-        neighbor_portion = [ChaosLemurGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]        
+        neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]        
 
         return "\n".join(neighbor_portion)
 
@@ -82,7 +113,16 @@ class ChaosLemurGenerator:
     @staticmethod
     def buildTopologyPortionHub(num, curr, subnet, hub_num):
         ##TODO: Implement
-
+        return
+    ###
+    # Add timestamp to any name
+    ###
+    @staticmethod
+    def addTimeStamp(name):
+        FORMAT = '%Y%m%d%H%M%S'
+        datestring = datetime.datetime.now().strftime(FORMAT)
+        new_name = '%s_%s' % (name, datestring)
+        return new_name
 
     ###
     # Return simple "neighbor IP" string for given router number
@@ -90,4 +130,17 @@ class ChaosLemurGenerator:
     @staticmethod
     def neighborString(subnet, no):
         return "neighbor " + subnet[:-1] + str(no)
+
+
+class ChaosLemurContextGenerator:
+
+    def __init__(self, configs, root):
+        self.bgpd_list = configs
+        self.root_path = root
+
+    def buildContext():
+        copyInFiles()
+        
+        
+
 
