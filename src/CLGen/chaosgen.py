@@ -20,17 +20,17 @@ class ChaosLemurConfigGenerator:
         
         self.bgpd_template = []
         self.subnet = ""
-        loadTemplate() 
+        self.loadTemplate() 
     
     
-    def recycle(num_routers, topology):
+    def recycle(self, num_routers, topology):
         self.num_routers = num_routers
         self.topology = topology   
     
     ###
     # Load bgpd.conf.template file from fs, extract portion describing self/neighbors
     ###
-    def loadTemplate():
+    def loadTemplate(self):
         # Get portion of conf template listing router IP, neighbor
         with open ("bgpd.conf.template", "r") as tfile:
             self.bgpd_template = tfile.readlines()
@@ -43,7 +43,7 @@ class ChaosLemurConfigGenerator:
 
     # path - location to save new bgpd.conf files
     ###
-    def generateConfigs(path):
+    def generateConfigs(self):
 
         ## Get docker network inspection info on default 'bridge' docker network
         inspectProc = subprocess.Popen(["sudo", "docker", "network", "inspect", "bridge"], stdout=subprocess.PIPE)
@@ -57,16 +57,16 @@ class ChaosLemurConfigGenerator:
         all_configs = []
         for rt in range(1, self.num_routers+1):
             # topology_to_method
-            curr_conf = buildTopologyPortionMesh(self.num_routers, rt, self.subnet)
+            curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionMesh(self.num_routers, rt, self.subnet)
             all_configs.append((rt, curr_conf))
 
-        bgpd_confs = __makeConfigs(all_configs)
-
+        bgpd_confs = self.__makeConfigs(all_configs)
+        print bgpd_confs
     
     ###
     #
     ###
-    def __makeContext(bgpd_confs):
+    def __makeContext(self, bgpd_confs):
         root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("ChaosLemurContext")
         if not os.path.exists(root_dir_name):
             os.makedirs(root_dir_name)
@@ -77,12 +77,13 @@ class ChaosLemurConfigGenerator:
     # Given list of neighbor-listing portions that contain topology info,
     # builds 4 full bgpd.conf files (as lists of lines) , returns list of those lists
     ###
-    def __makeConfigs(list_of_portions):
+    def __makeConfigs(self, list_of_portions):
         all_bgpd = []
-        start_line = 16
-        router_line = 14
-        for tupl in list_of_configs:
-            router_statement = "router bgp " + self.subnet[:-1] + tupl[0]
+        start_line = 15
+        network_line = 14
+        router_line = 13
+        for tupl in list_of_portions:
+            router_statement = "router bgp " + self.subnet[:-1] + str(tupl[0])
             cf_portion = tupl[1]
             end_line = start_line + len(cf_portion) + 1
             bgpd = self.bgpd_template
@@ -113,6 +114,7 @@ class ChaosLemurConfigGenerator:
     @staticmethod
     def buildTopologyPortionHub(num, curr, subnet, hub_num):
         ##TODO: Implement
+        
         return
     ###
     # Add timestamp to any name
@@ -138,7 +140,7 @@ class ChaosLemurContextGenerator:
         self.bgpd_list = configs
         self.root_path = root
 
-    def buildContext():
+    def buildContext(self):
         copyInFiles()
         
         
