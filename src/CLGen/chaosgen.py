@@ -10,6 +10,7 @@
 import subprocess
 import json
 import datetime
+import os
 # import docker-py
 
 class ChaosLemurConfigGenerator:
@@ -43,7 +44,7 @@ class ChaosLemurConfigGenerator:
 
     # path - location to save new bgpd.conf files
     ###
-    def generateConfigs(self):
+    def generateConfigsAndReturnContext(self):
 
         ## Get docker network inspection info on default 'bridge' docker network
         inspectProc = subprocess.Popen(["sudo", "docker", "network", "inspect", "bridge"], stdout=subprocess.PIPE)
@@ -52,26 +53,29 @@ class ChaosLemurConfigGenerator:
         ## Extract subnet/gateway from JSON response
         jsonResp = json.loads(inspectResponse)[0]
         self.subnet = jsonResp["IPAM"]["Config"][0]["Subnet"]
-
+        print "Subnet: " + self.subnet
         ## TODO: Build bgpd.conf string for each router, save
         all_configs = []
         for rt in range(1, self.num_routers+1):
             # topology_to_method
-            curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionMesh(self.num_routers, rt, self.subnet)
+            curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionMesh(self.num_routers, rt, self.subnet[:-3])
             all_configs.append((rt, curr_conf))
-
         bgpd_confs = self.__makeConfigs(all_configs)
-        print bgpd_confs
+        context = self.__makeContext(bgpd_confs)
+
     
     ###
     #
     ###
     def __makeContext(self, bgpd_confs):
-        root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("ChaosLemurContext")
+        root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("_ChaosLemurContext")
         if not os.path.exists(root_dir_name):
             os.makedirs(root_dir_name)
         
+        contextGen = ChaosLemurContextGenerator(bgpd_confs, root_dir_name)
+        contextGen.buildContext()
         
+        return root_dir_name
 
     ###
     # Given list of neighbor-listing portions that contain topology info,
@@ -83,12 +87,13 @@ class ChaosLemurConfigGenerator:
         network_line = 14
         router_line = 13
         for tupl in list_of_portions:
-            router_statement = "router bgp " + self.subnet[:-1] + str(tupl[0])
+            router_statement = "router bgp " + self.subnet[:-4] + str(tupl[0]) + "\n"
             cf_portion = tupl[1]
             end_line = start_line + len(cf_portion) + 1
-            bgpd = self.bgpd_template
+            bgpd = self.bgpd_template[:]
             bgpd[router_line] = router_statement
             bgpd[start_line:end_line] = cf_portion
+            bgpd[network_line] = "network " + self.subnet + "\n"
             all_bgpd.append(bgpd)
 
         return all_bgpd
@@ -104,8 +109,7 @@ class ChaosLemurConfigGenerator:
         all_except_me = range(1, num+1)
         all_except_me.remove(curr)
         neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]        
-
-        return "\n".join(neighbor_portion)
+        return neighbor_portion
 
     ###
     # Build bgpd.conf file from template for specific router number, given total number
@@ -131,7 +135,7 @@ class ChaosLemurConfigGenerator:
     ###
     @staticmethod
     def neighborString(subnet, no):
-        return "neighbor " + subnet[:-1] + str(no)
+        return "neighbor " + subnet[:-1] + str(no) + "\n"
 
 
 class ChaosLemurContextGenerator:
@@ -141,8 +145,49 @@ class ChaosLemurContextGenerator:
         self.root_path = root
 
     def buildContext(self):
-        copyInFiles()
+        for bgpd_conf in self.bgpd_list:
+            print "Conf: " + str(self.bgpd_list.index(bgpd_conf))
+            self.copyInFiles(bgpd_conf, self.bgpd_list.index(bgpd_conf))
         
         
+        
+    def copyInFiles(self, bgpd_conf, no):
+        this_container_dir = "router%s" % (no)
+        this_container_path = self.root_path + "/" + this_container_dir
+        if not os.path.exists(this_container_path):
+            os.makedirs(this_container_path)
+        copyDockerfileCommand = "cp Dockerfile.template %s/%s/Dockerfile" % (self.root_path, this_container_dir)
+        bgpd_file_loc = "%s/%s/bgpd.conf" % (self.root_path, this_container_dir)
+        bgpd_file = open(bgpd_file_loc, "w")
+        bgpd_file.writelines(bgpd_conf)
+        bgpd_file.close()    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
