@@ -65,7 +65,7 @@ class ChaosLemurConfigGenerator:
             all_configs.append((rt, curr_conf))
         bgpd_confs = self.__makeConfigs(all_configs)
         context = self.__makeContext(bgpd_confs)
-
+        
     
     ###
     #
@@ -77,7 +77,7 @@ class ChaosLemurConfigGenerator:
         
         contextGen = ChaosLemurContextGenerator(bgpd_confs, root_dir_name)
         contextGen.buildContext()
-        
+        contextGen.buildContainers()
         return root_dir_name
 
     ###
@@ -90,7 +90,7 @@ class ChaosLemurConfigGenerator:
         network_line = 14
         router_line = 13
         for tupl in list_of_portions:
-            router_statement = "router bgp " + self.subnet[:-4] + str(tupl[0]) + "\n"
+            router_statement = "bgp router-id " + self.subnet[:-4] + str(tupl[0]) + "\n"
             cf_portion = tupl[1]
             end_line = start_line + len(cf_portion) + 1
             bgpd = self.bgpd_template[:]
@@ -176,6 +176,20 @@ class ChaosLemurContextGenerator:
         os.system(copyZebraCommand)
         os.system(copyIdRSACommand)
         os.system(copyQuaggaSHCommand)
+
+    ###
+    # Build and run all generated containers
+    ###
+    def buildContainers(self):
+        for bgpd_conf in self.bgpd_list:
+            i = self.bgpd_list.index(bgpd_conf)
+            this_dir = "%s/router%s" % (self.root_path, i)
+            buildCommand = "sudo docker build -t quag%s %s" % (i, this_dir)
+            runCommand = "sudo docker run -d -privileged quag%s" % (i)
+            os.system(buildCommand)
+            os.system(runCommand)
+    
+         
 
 
 
