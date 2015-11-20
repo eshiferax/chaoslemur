@@ -5,6 +5,7 @@
 
 import unittest
 import chaosgen as cg
+import sys
 
 class ChaosLemurConfigGeneratorTest(unittest.TestCase):
     
