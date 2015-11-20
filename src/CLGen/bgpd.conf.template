@@ -24,6 +24,6 @@ network 10.0.0.0/8
 ! match ip address all
 ! set ip next-hop 10.0.0.1
 !
-!log file /var/log/quagga/bgpd.log
+log file /var/log/quagga/bgpd.log
 !
-log stdout
+!log stdout

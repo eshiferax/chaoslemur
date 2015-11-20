@@ -58,7 +58,10 @@ class ChaosLemurConfigGenerator:
         all_configs = []
         for rt in range(1, self.num_routers+1):
             # topology_to_method
-            curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionMesh(self.num_routers, rt, self.subnet[:-3])
+            if self.topology == "mesh":
+                curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionMesh(self.num_routers, rt, self.subnet[:-3])
+            elif self.topology == "hub":
+                curr_conf = ChaosLemurConfigGenerator.buildTopologyPortionHub(self.num_routers, rt, self.subnet[:-3], 2)
             all_configs.append((rt, curr_conf))
         bgpd_confs = self.__makeConfigs(all_configs)
         context = self.__makeContext(bgpd_confs)
@@ -162,10 +165,17 @@ class ChaosLemurContextGenerator:
         if not os.path.exists(this_container_path):
             os.makedirs(this_container_path)
         copyDockerfileCommand = "cp Dockerfile.template %s/%s/Dockerfile" % (self.root_path, this_container_dir)
+        copyZebraCommand = "cp zebra.conf %s/%s/zebra.conf" % (self.root_path, this_container_dir)
+        copyIdRSACommand = "sudo cp id_rsa* %s/%s/" % (self.root_path, this_container_dir)
+        copyQuaggaSHCommand = "cp quagga.sh %s/%s/" % (self.root_path, this_container_dir)
         bgpd_file_loc = "%s/%s/bgpd.conf" % (self.root_path, this_container_dir)
         bgpd_file = open(bgpd_file_loc, "w")
         bgpd_file.writelines(bgpd_conf)
-        bgpd_file.close()    
+        bgpd_file.close() 
+        os.system(copyDockerfileCommand)   
+        os.system(copyZebraCommand)
+        os.system(copyIdRSACommand)
+        os.system(copyQuaggaSHCommand)
 
 
 
