@@ -151,7 +151,7 @@ class ChaosLemurContextGenerator:
     def __init__(self, configs, root):
         self.bgpd_list = configs
         self.root_path = root
-
+        self.failure_event_list = [] # (event, time)
     def buildContext(self):
         for bgpd_conf in self.bgpd_list:
             print "Conf: " + str(self.bgpd_list.index(bgpd_conf))
@@ -190,8 +190,13 @@ class ChaosLemurContextGenerator:
             os.system(runCommand)
     
          
-
-
+    ###
+    # Take down Node
+    ###
+    def takeDownNode(self, num):
+        tdCommand = "sudo docker stop quag%num" % (num)
+        os.system(tdCommand)
+        self.failure_event_list.append(("failure", datetime.datetimenow()))
 
 
 
