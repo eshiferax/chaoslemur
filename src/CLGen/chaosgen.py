@@ -118,8 +118,13 @@ class ChaosLemurConfigGenerator:
     @staticmethod
     def buildTopologyPortionHub(num, curr, subnet, hub_num):
         ##TODO: Implement
-        
-        return
+        if(curr == hub_num):
+            all_except_me = range(1, num+1)
+            all_except_me.remove(curr)
+            neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]
+        else:
+            neighbor_portion = ChaosLemurConfigGenerator.neighborString(subnet, hub_num)
+        return neighbor_portion
     ###
     # Add timestamp to any name
     ###
