@@ -16,6 +16,7 @@ import os
 class ChaosLemurConfigGenerator:
     
     def __init__(self, num_routers, topology):
+        # TODO: Take input for choice of "distribution" of number of networks
         self.num_routers = num_routers
         self.topology = topology
         
@@ -152,6 +153,7 @@ class ChaosLemurContextGenerator:
         self.bgpd_list = configs
         self.root_path = root
         self.failure_event_list = [] # (event, time)
+ 
     def buildContext(self):
         for bgpd_conf in self.bgpd_list:
             print "Conf: " + str(self.bgpd_list.index(bgpd_conf))
@@ -186,23 +188,9 @@ class ChaosLemurContextGenerator:
             this_dir = "%s/router%s" % (self.root_path, i)
             buildCommand = "sudo docker build -t quag%s %s" % (i, this_dir)
             runCommand = "sudo docker run -d -privileged quag%s" % (i)
-            #os.system(buildCommand)
-            #os.system(runCommand)
+            os.system(buildCommand)
+            os.system(runCommand)
     
-         
-    ###
-    # Take down Node
-    ###
-    def takeDownNode(self, num):
-        tdCommand = "sudo docker stop quag%s" % (num)
-        os.system(tdCommand)
-        self.failure_event_list.append(("failure", datetime.datetimenow()))
-
-
-
-
-
-
 
 
 
