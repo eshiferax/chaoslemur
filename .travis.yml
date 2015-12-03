@@ -1,9 +1,0 @@
-language: python
-sudo: required
-python:
-  - "2.6"
-  - "2.7"
-services:
-  - docker
-script:
-  - sudo python src/CLGen/ChaosLemurConfigGeneratorTest.py
