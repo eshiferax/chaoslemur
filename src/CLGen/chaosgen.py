@@ -193,7 +193,7 @@ class ChaosLemurContextGenerator:
             i = self.bgpd_list.index(bgpd_conf)
             this_dir = "%s/router%s" % (self.root_path, i)
             buildCommand = "sudo docker build -t quag%s %s" % (i, this_dir)
-            runCommand = "sudo docker run -d -privileged quag%s" % (i)
+            runCommand = "sudo docker run --privileged -it -d quag%s" % (i)
             os.system(buildCommand)
             #os.system(runCommand)
     
