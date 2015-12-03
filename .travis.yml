@@ -1,6 +1,9 @@
 language: python
+sudo: required
 python:
   - "2.6"
   - "2.7"
+install:
+  - sudo apt-get install docker-engine
 script:
-  - python src/CLGen/ChaosLemurConfigGeneratorTest.py
+  - sudo python src/CLGen/ChaosLemurConfigGeneratorTest.py
