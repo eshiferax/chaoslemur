@@ -1,0 +1,28 @@
+#!/bin/bash -er
+
+# Be a good init
+trap clean_exit EXIT
+function clean_exit {
+ local pids=$(jobs -p)
+ if [[ "$pids" != "" ]]; then
+  kill $pids || :
+ fi
+ wait $pids
+}
+
+echo "Starting daemons."
+for svc in zebra bgpd isisd ospfd ospf6d ripd ripngd; do
+ if [ -f /etc/quagga/${svc}.conf ]; then
+  echo "Starting ${svc}."
+  $svc &
+ fi
+done
+
+# Keep the console alive.
+while :; do
+ echo "------------------------------------------------------"
+ echo "Attaching console. To disconnect, press Ctrl-P Ctrl-Q."
+ echo "------------------------------------------------------"
+ vtysh || :
+ sleep 1
+done

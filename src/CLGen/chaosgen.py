@@ -13,8 +13,11 @@ import datetime
 import os
 # import docker-py
 
+
+
 class ChaosLemurConfigGenerator:
-    
+      
+    DEFAULT_AS = 7675
     def __init__(self, num_routers, topology):
         # TODO: Take input for choice of "distribution" of number of networks
         self.num_routers = num_routers
@@ -91,7 +94,7 @@ class ChaosLemurConfigGenerator:
         network_line = 14
         router_line = 13
         for tupl in list_of_portions:
-            router_statement = "bgp router-id " + self.subnet[:-4] + str(tupl[0]) + "\n"
+            router_statement = "bgp router-id " + self.subnet[:-4] + str(tupl[0]+1) + "\n"
             cf_portion = tupl[1]
             end_line = start_line + len(cf_portion) + 1
             bgpd = self.bgpd_template[:]
@@ -110,9 +113,9 @@ class ChaosLemurConfigGenerator:
     ###
     @staticmethod
     def buildTopologyPortionMesh(num, curr, subnet):
-        all_except_me = range(1, num+1)
-        all_except_me.remove(curr)
-        neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]        
+        all_except_me = range(2, num+2)
+        all_except_me.remove(curr+1)
+        neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor, ChaosLemurConfigGenerator.DEFAULT_AS) for neighbor in all_except_me]        
         return neighbor_portion
 
     ###
@@ -123,11 +126,11 @@ class ChaosLemurConfigGenerator:
     def buildTopologyPortionHub(num, curr, subnet, hub_num):
         ##TODO: Implement
         if(curr == hub_num):
-            all_except_me = range(1, num+1)
-            all_except_me.remove(curr)
-            neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor) for neighbor in all_except_me]
+            all_except_me = range(2, num+2)
+            all_except_me.remove(curr+1)
+            neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor, ChaosLemurConfigGenerator.DEFAULT_AS) for neighbor in all_except_me]
         else:
-            neighbor_portion = ChaosLemurConfigGenerator.neighborString(subnet, hub_num)
+            neighbor_portion = ChaosLemurConfigGenerator.neighborString(subnet, hub_num, ChaosLemurConfigGenerator.DEFAULT_AS)
         return neighbor_portion
     ###
     # Add timestamp to any name
@@ -143,8 +146,8 @@ class ChaosLemurConfigGenerator:
     # Return simple "neighbor IP" string for given router number
     ###
     @staticmethod
-    def neighborString(subnet, no):
-        return "neighbor " + subnet[:-1] + str(no) + "\n"
+    def neighborString(subnet, no, remote_as):
+        return "neighbor " + subnet[:-1] + str(no) + " remote-as " +  str(remote_as) + "\n"
 
 
 class ChaosLemurContextGenerator:
@@ -166,18 +169,21 @@ class ChaosLemurContextGenerator:
         this_container_path = self.root_path + "/" + this_container_dir
         if not os.path.exists(this_container_path):
             os.makedirs(this_container_path)
-        copyDockerfileCommand = "cp Dockerfile.template %s/%s/Dockerfile" % (self.root_path, this_container_dir)
-        copyZebraCommand = "cp zebra.conf %s/%s/zebra.conf" % (self.root_path, this_container_dir)
-        copyIdRSACommand = "sudo cp id_rsa* %s/%s/" % (self.root_path, this_container_dir)
-        copyQuaggaSHCommand = "cp quagga.sh %s/%s/" % (self.root_path, this_container_dir)
+        
+        osCommands = []
+        copyQuaggaInitCommand = "cp quagga-init %s/%s/" % (self.root_path, this_container_dir); osCommands.append(copyQuaggaInitCommand); 
+        copyDockerfileCommand = "cp Dockerfile.template %s/%s/Dockerfile" % (self.root_path, this_container_dir); osCommands.append(copyDockerfileCommand);
+        copyZebraCommand = "cp zebra.conf %s/%s/zebra.conf" % (self.root_path, this_container_dir); osCommands.append(copyZebraCommand);
+        copyVtyshCommand = "cp vtysh.conf %s/%s/vtysh.conf" % (self.root_path, this_container_dir); osCommands.append(copyVtyshCommand);
+        # copyIdRSACommand = "sudo cp id_rsa* %s/%s/" % (self.root_path, this_container_dir); osCommands.append(copyIdRSACommand);
+        # copyQuaggaSHCommand = "cp quagga.sh %s/%s/" % (self.root_path, this_container_dir); osCommands.append(copyQuaggaSHCommand);
         bgpd_file_loc = "%s/%s/bgpd.conf" % (self.root_path, this_container_dir)
         bgpd_file = open(bgpd_file_loc, "w")
         bgpd_file.writelines(bgpd_conf)
         bgpd_file.close() 
-        os.system(copyDockerfileCommand)   
-        os.system(copyZebraCommand)
-        os.system(copyIdRSACommand)
-        os.system(copyQuaggaSHCommand)
+        
+        for command in osCommands:
+            os.system(command);
 
     ###
     # Build and run all generated containers
@@ -189,7 +195,7 @@ class ChaosLemurContextGenerator:
             buildCommand = "sudo docker build -t quag%s %s" % (i, this_dir)
             runCommand = "sudo docker run -d -privileged quag%s" % (i)
             os.system(buildCommand)
-            os.system(runCommand)
+            #os.system(runCommand)
     
 
 

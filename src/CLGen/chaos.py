@@ -4,7 +4,7 @@
 #Davis Gossage
 # CS514: Computer Networks and Distributed Systems
 
-# Contains classes used to destroy
+# Contains classes used to destroy and recover nodes and links in ChaosLemur
 
 import datetime
 import random
@@ -26,16 +26,25 @@ class ChaosLemur:
         self.event_list.append(failure_event)
 
     ###
+    # Take down link
+    ###
+    def takeDownLink(self, rt1, rt2):
+        # TODO: Implement
+        print "Taking down link between router %s and router %s" % (rt1, rt2)
+
+    ###
     # Reverse all failures
     ###
     def reverseFailures(self):
         
         for event in self.event_list:
-            # TODO: Implement
             if event.event_type == "Failure":
                 recover_command = "sudo docker start quag%s" % (event.num)
                 os.system(recover_command)
                 print "Reversing failure for node %s" % (event.num)
+        
+        recovery_event = ChaosLemurEvent("Full Recovery", datetime.datetime.now())
+        self.event_list.append(recovery_event)
 
     ###
     # Take down RANDOM node
@@ -44,6 +53,7 @@ class ChaosLemur:
         
         node_to_fail = random.randint(0, self.num_routers)
         self.takeDownNode(node_to_fail)
+    
 
 class ChaosLemurEvent:
 
