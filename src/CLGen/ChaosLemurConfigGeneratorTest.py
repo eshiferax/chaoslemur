@@ -6,6 +6,11 @@
 import unittest
 import chaosgen as cg
 import sys
+import os
+
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 class ChaosLemurConfigGeneratorTest(unittest.TestCase):
     
