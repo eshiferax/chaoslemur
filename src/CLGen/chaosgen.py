@@ -27,7 +27,7 @@ class ChaosLemurConfigGenerator:
         
         self.bgpd_template = []
         self.subnet = ""
-        self.subnet_amounts = [0 for i in range(1,num_routers+1]
+        self.subnet_amounts = [0 for i in range(1,num_routers+1)]
         self.loadTemplate() 
         self.calculateDistributions()  
     
@@ -49,8 +49,8 @@ class ChaosLemurConfigGenerator:
     ###
     def calculateDistributions(self):
         
-        for i in range(1, self.num_routers + 1):
-            if(self.net_distrib == "uniform"):
+        for i in range(0, self.num_routers):
+            if(self.distribution == "uniform"):
                 self.subnet_amounts[i] = random.randint(1,10)
             
 
