@@ -51,8 +51,17 @@ class ChaosLemurConfigGenerator:
         
         for i in range(0, self.num_routers):
             if(self.distribution == "uniform"):
-                self.subnet_amounts[i] = random.randint(1,10)
-            
+                dval = random.randint(1,10)
+            elif self.distribution == "lognormal":
+                dval = int(random.lognormvariate(1,2))
+            elif self.distribution == "pareto":
+                dval = int(random.paretovariate(0.6))
+            if dval > 20:
+                dval = 20
+            elif dval < 1:
+                dval = 1
+            self.subnet_amounts[i] = int(dval_
+        print self.subnet_amounts
 
 
     ###
