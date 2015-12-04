@@ -11,6 +11,7 @@ import subprocess
 import json
 import datetime
 import os
+import random
 # import docker-py
 
 
@@ -18,15 +19,17 @@ import os
 class ChaosLemurConfigGenerator:
       
     DEFAULT_AS = 7675
-    def __init__(self, num_routers, topology):
+    def __init__(self, num_routers, topology, net_distrib):
         # TODO: Take input for choice of "distribution" of number of networks
         self.num_routers = num_routers
         self.topology = topology
+        self.distribution = net_distrib
         
         self.bgpd_template = []
         self.subnet = ""
+        self.subnet_amounts = [0 for i in range(1,num_routers+1]
         self.loadTemplate() 
-    
+        self.calculateDistributions()  
     
     def recycle(self, num_routers, topology):
         self.num_routers = num_routers
@@ -40,6 +43,17 @@ class ChaosLemurConfigGenerator:
         with open ("bgpd.conf.template", "r") as tfile:
             self.bgpd_template = tfile.readlines()
             # self.router_portion = bgpd_template[13:19]
+
+    ###
+    # Given distribution pattern specified, calculate number of subnets initially loaded into each router.
+    ###
+    def calculateDistributions(self):
+        
+        for i in range(1, self.num_routers + 1):
+            if(self.net_distrib == "uniform"):
+                self.subnet_amounts[i] = random.randint(1,10)
+            
+
 
     ###
     # Given desired number of routers and topology, will generate
@@ -57,8 +71,9 @@ class ChaosLemurConfigGenerator:
         ## Extract subnet/gateway from JSON response
         jsonResp = json.loads(inspectResponse)[0]
         self.subnet = jsonResp["IPAM"]["Config"][0]["Subnet"]
-        print "Subnet: " + self.subnet
-        ## TODO: Build bgpd.conf string for each router, save
+        # print "Subnet: " + self.subnet
+        
+        ## Build bgpd.conf string for each router, save
         all_configs = []
         for rt in range(1, self.num_routers+1):
             # topology_to_method
@@ -195,7 +210,7 @@ class ChaosLemurContextGenerator:
             buildCommand = "sudo docker build -t quag%s %s" % (i, this_dir)
             runCommand = "sudo docker run --privileged -it -d quag%s" % (i)
             os.system(buildCommand)
-            #os.system(runCommand)
+            os.system(runCommand)
     
 
 
