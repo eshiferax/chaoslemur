@@ -53,7 +53,7 @@ class ChaosLemurConfigGenerator:
         
         for i in range(0, self.num_routers):
             if(self.distribution == "uniform"):
-                dval = random.randint(self.param1, self.param2))
+                dval = random.randint(self.param1, self.param2)
             elif self.distribution == "lognormal":
                 dval = int(random.lognormvariate(self.param1, self.param2))
             elif self.distribution == "pareto":
@@ -62,7 +62,7 @@ class ChaosLemurConfigGenerator:
                 dval = 20
             elif dval < 1:
                 dval = 1
-            self.subnet_amounts[i] = int(dval_
+            self.subnet_amounts[i] = int(dval)
         print self.subnet_amounts
 
 
@@ -101,7 +101,7 @@ class ChaosLemurConfigGenerator:
     #
     ###
     def __makeContext(self, bgpd_confs):
-        root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("_ChaosLemurContext")
+        root_dir_name = ChaosLemurConfigGenerator.addTimeStamp("_ChaosLemur_" + self.topology + "_" + self.distribution)
         if not os.path.exists(root_dir_name):
             os.makedirs(root_dir_name)
         
@@ -120,13 +120,23 @@ class ChaosLemurConfigGenerator:
         network_line = 14
         router_line = 13
         for tupl in list_of_portions:
+            ind = list_of_portions.index(tupl)
+            num_subnets = self.subnet_amounts[ind]
+            start_line = network_line + num_subnets
+            
             router_statement = "bgp router-id " + self.subnet[:-4] + str(tupl[0]+1) + "\n"
             cf_portion = tupl[1]
+                          
             end_line = start_line + len(cf_portion) + 1
             bgpd = self.bgpd_template[:]
+            # insert blank lines equal to amount of subnets
+            bgpd = bgpd[:network_line] + ["network BLANK" for i in range(0,num_subnets)] + bgpd[start_line:]
+
             bgpd[router_line] = router_statement
             bgpd[start_line:end_line] = cf_portion
-            bgpd[network_line] = "network " + self.subnet + "\n"
+            bgpd[network_line:start_line] = [("network " + subnet) for subnet in ChaosLemurConfigGenerator.getSubnets(num_subnets)]
+            #bgpd[network_line] = "network " + self.subnet + "\n"
+            
             all_bgpd.append(bgpd)
 
         return all_bgpd
@@ -175,6 +185,20 @@ class ChaosLemurConfigGenerator:
     def neighborString(subnet, no, remote_as):
         return "neighbor " + subnet[:-1] + str(no) + " remote-as " +  str(remote_as) + "\n"
 
+    ###
+    # Return X random prefixes from subnets.txt pool
+    ###
+    @staticmethod
+    def getSubnets(num):
+        # Get pool to choose from
+        with open ("subnets.txt", "r") as tfile:
+            all_nets  = tfile.readlines()
+  
+        to_return = []
+        while len(to_return) < num:
+            to_return.append(all_nets[random.randint(0,len(all_nets)-1)])
+
+        return to_return
 
 class ChaosLemurContextGenerator:
 
