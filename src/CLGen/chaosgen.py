@@ -19,11 +19,13 @@ import random
 class ChaosLemurConfigGenerator:
       
     DEFAULT_AS = 7675
-    def __init__(self, num_routers, topology, net_distrib):
+    def __init__(self, num_routers, topology, net_distrib, dist_param_1=1, dist_param_2=10):
         # TODO: Take input for choice of "distribution" of number of networks
         self.num_routers = num_routers
         self.topology = topology
         self.distribution = net_distrib
+        self.param1 = dist_param_1
+        self.param2 = dist_param_2
         
         self.bgpd_template = []
         self.subnet = ""
@@ -51,11 +53,11 @@ class ChaosLemurConfigGenerator:
         
         for i in range(0, self.num_routers):
             if(self.distribution == "uniform"):
-                dval = random.randint(1,10)
+                dval = random.randint(self.param1, self.param2))
             elif self.distribution == "lognormal":
-                dval = int(random.lognormvariate(1,2))
+                dval = int(random.lognormvariate(self.param1, self.param2))
             elif self.distribution == "pareto":
-                dval = int(random.paretovariate(0.6))
+                dval = int(random.paretovariate(self.param1))
             if dval > 20:
                 dval = 20
             elif dval < 1:
