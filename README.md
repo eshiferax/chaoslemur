@@ -14,6 +14,7 @@ Uses [Quagga](http://www.nongnu.org/quagga/) for building virtual network, [Dock
   * All the other pre-defined tests are python scripts following the same convention: CL_HubPareto.py, CL_MeshLognormal.py, etc.
   * After running one of the pre-defined tests, you can get the names of all running containers by running `sh src/CLGen/utility/running_container_names.sh`
   * You can then log into the vtysh console of any router with: `sudo docker attach $NAME `, where $NAME is any from the list obtained from the previous instruction.
+  * You can also simply run `sudo python LogInToRouter.py $NUM`, where $NUM is the index of the router (running from 0 to the total number of routers minus 1).
   * You can show the table of prefixes on any router (current state of knowledge) with the src/CLGen/ShowIPRoute.py script. It takes in as an argument the 'index' of the router whose information is being requested. This index is simply the position of the router's name in the list returned by the aformentioned running_container_names script.
   * To run a test that takes down a router, displays the routing table of another (still alive) router, and reverses it (brings back node), run `sudo python src/CLGen/ChaosLemurTest.py.`
   * To run a test that simply takes down a random router, run `sudo python src/CLGen/TakeDownNodeTest.py`

@@ -94,6 +94,14 @@ class ChaosLemur:
         while rt_num == dead_one:
             rt_num = random.randint(0, len(self.names)-1)
         self.showIPRoute(rt_num)
+     
+    ###
+    # Attach to specific router
+    ###
+    def attachTo(self, rt_num):
+        rt_name = self.names[rt_num]
+        attach_command= "sudo docker attach %s" % (rt_name)
+        os.system(attach_command)
         
 class ChaosLemurEvent:
 
