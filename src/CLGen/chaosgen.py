@@ -166,7 +166,7 @@ class ChaosLemurConfigGenerator:
             all_except_me.remove(curr+1)
             neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, neighbor, ChaosLemurConfigGenerator.DEFAULT_AS) for neighbor in all_except_me]
         else:
-            neighbor_portion = ChaosLemurConfigGenerator.neighborString(subnet, hub_num, ChaosLemurConfigGenerator.DEFAULT_AS)
+            neighbor_portion = [ChaosLemurConfigGenerator.neighborString(subnet, hub_num + 1, ChaosLemurConfigGenerator.DEFAULT_AS)]
         return neighbor_portion
     ###
     # Add timestamp to any name
