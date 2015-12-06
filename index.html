@@ -1,39 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <title>ChaosLemur by eshiferax</title>
 
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-
-    <title>ChaosLemur by eshiferax</title>
   </head>
-
   <body>
-    <header>
-      <div class="inner">
+    <div class="wrapper">
+      <header>
         <h1>ChaosLemur</h1>
-        <h2>Injecting failures into BGP.</h2>
-        <a href="https://github.com/eshiferax/chaoslemur" class="button"><small>View project on</small> GitHub</a>
-      </div>
-    </header>
+        <p>Injecting failures into BGP.</p>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
-        <section id="main-content">
-          <h1>
+        <p class="view"><a href="https://github.com/eshiferax/chaoslemur">View the Project on GitHub <small>eshiferax/chaoslemur</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/eshiferax/chaoslemur/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/eshiferax/chaoslemur/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/eshiferax/chaoslemur">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
 <a id="chaoslemur" class="anchor" href="#chaoslemur" aria-hidden="true"><span class="octicon octicon-link"></span></a>ChaosLemur</h1>
 
 <p>Injecting failures into BGP.</p>
 
-<p>Inspired by <a href="http://principlesofchaos.org">Chaos Engineering</a> from Netflix and <a href="http://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p371.pdf">SDN ChaosMonkey</a>.</p>
+<p>Inspired by <a href="http://principlesofchaos.org">Chaos Engineering</a> from Netflix and <a href="http://conferences.sigcomm.org/sigcomm/2015/pdf/papers/p371.pdf">SDN ChaosMonkey</a>. </p>
 
 <p>Uses <a href="http://www.nongnu.org/quagga/">Quagga</a> for building virtual network, <a href="http://docker.com">Docker</a> for running separate virtual BGP routers/ASes on containers.</p>
 
@@ -41,9 +41,20 @@
 <a id="how-to-buildrun" class="anchor" href="#how-to-buildrun" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to Build/Run</h2>
 
 <ul>
-<li>To install all dependencies, run cl_install.sh</li>
+<li>This system was tested on a VM running Bitnami's Ubuntu base image, provided by Duke's <a href="https://colab.duke.edu/">Innovation Co-Lab</a>.</li>
+<li>Many ChaosLemur scripts require root access, and have been tested primarily with <code>sudo</code>. </li>
+<li>To install dependencies (docker), run <code>sudo sh install/cl_install.sh</code>.</li>
 <li>To run the pre-defined test setting up a ChaosLemur experiment with 4 routers in a mesh topology,
-run "sudo python src/CLGen/ChaosLemurConfigGenerator.py".</li>
+run <code>sudo python src/CLGen/CL_MeshUniformTest.py</code>.</li>
+<li>All the other pre-defined tests are python scripts following the same convention: CL_HubPareto.py, CL_MeshLognormal.py, etc.</li>
+<li>After running one of the pre-defined tests, you can get the names of all running containers by running <code>sh src/CLGen/utility/running_container_names.sh</code>
+</li>
+<li>You can then log into the vtysh console of any router with: <code>sudo docker attach $NAME</code>, where $NAME is any from the list obtained from the previous instruction.</li>
+<li>You can show the table of prefixes on any router (current state of knowledge) with the src/CLGen/ShowIPRoute.py script. It takes in as an argument the 'index' of the router whose information is being requested. This index is simply the position of the router's name in the list returned by the aformentioned running_container_names script.</li>
+<li>To run a test that takes down a router, displays the routing table of another (still alive) router, and reverses it (brings back node), run <code>sudo python src/CLGen/ChaosLemurTest.py.</code>
+</li>
+<li>To run a test that simply takes down a random router, run <code>sudo python src/CLGen/TakeDownNodeTest.py</code>
+</li>
 </ul>
 
 <h2>
@@ -51,37 +62,32 @@ run "sudo python src/CLGen/ChaosLemurConfigGenerator.py".</li>
 
 <ul>
 <li>Scripts for configuring and running docker containers with quagga, able to speak BGP to each other.</li>
-<li>API to introduce single-node failures and reverse them. (Taking down individual routers).</li>
-<li>Logging of BGP</li>
+<li>Ability to input desired number of routers, distribution pattern/paremeters for number of networks initially advertised, and desired network topology (choice of mesh/hub).</li>
+<li>API methods to introduce single-node failures and reverse them. (Taking down individual routers).</li>
+<li>API method to report BGP routing table of routers.</li>
+<li>API method for link failures (NOT FUNCTIONAL - vtysh does not accept "neighbor <em>peer</em> shutdown" command).</li>
 </ul>
 
 <h2>
 <a id="planned-features" class="anchor" href="#planned-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Planned Features</h2>
 
 <ul>
-<li>API for link failures.</li>
-<li>Parsing, interpretation of BGP logs for measuring "response" to failures.</li>
-<li>Allow user to build initial "Experiment Plan" for failures that will be introduced to BGP network, and then have them continuously updated.</li>
+<li>Parsing, interpretation of full BGP logs.</li>
 </ul>
-        </section>
 
-        <aside id="sidebar">
-          <a href="https://github.com/eshiferax/chaoslemur/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/eshiferax/chaoslemur/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+<h1>
+<a id="acknowledgements" class="anchor" href="#acknowledgements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgements</h1>
 
-          <p class="repo-owner"><a href="https://github.com/eshiferax/chaoslemur"></a> is maintained by <a href="https://github.com/eshiferax">eshiferax</a>.</p>
-
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
-        </aside>
-      </div>
+<ul>
+<li>Used <a href="https://github.com/ewindisch/docker-quagga">docker-quagga</a> as a starting point for a Docker image that would work well with Quagga.</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/eshiferax">eshiferax</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
-  
+    <script src="javascripts/scale.fix.js"></script>
+    
   </body>
 </html>
