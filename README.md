@@ -8,24 +8,24 @@ Uses [Quagga](http://www.nongnu.org/quagga/) for building virtual network, [Dock
 ## How to Build/Run
   * This system was tested on a VM running Bitnami's Ubuntu base image, provided by Duke's [Innovation Co-Lab](https://colab.duke.edu/).
   * Many ChaosLemur scripts require root access, and have been tested primarily with `sudo`. 
-  * To install dependencies (docker), run install/cl_install.sh
+  * To install dependencies (docker), run `sudo sh install/cl_install.sh`.
   * To run the pre-defined test setting up a ChaosLemur experiment with 4 routers in a mesh topology,
-    run "sudo python src/CLGen/CL_MeshUniformTest.py".
+    run `sudo python src/CLGen/CL_MeshUniformTest.py`.
   * All the other pre-defined tests are python scripts following the same convention: CL_HubPareto.py, CL_MeshLognormal.py, etc.
-  * After running one of the pre-defined tests, you can get the names of all running containers with the script src/CLGen/utility/running_container_names.sh
+  * After running one of the pre-defined tests, you can get the names of all running containers by running `sh src/CLGen/utility/running_container_names.sh`
   * You can then log into the vtysh console of any router with: `sudo docker attach $NAME `, where $NAME is any from the list obtained from the previous instruction.
   * You can show the table of prefixes on any router (current state of knowledge) with the src/CLGen/ShowIPRoute.py script. It takes in as an argument the 'index' of the router whose information is being requested. This index is simply the position of the router's name in the list returned by the aformentioned running_container_names script.
-  * To run a test that takes down a router, displays the routing table of another (still alive) router, and reverses it (brings back node), run src/CLGen/ChaosLemurTest.py.
-  * To run a test that simply takes down a random router, run src/CLGen/TakeDownNodeTest.py
+  * To run a test that takes down a router, displays the routing table of another (still alive) router, and reverses it (brings back node), run `sudo python src/CLGen/ChaosLemurTest.py.`
+  * To run a test that simply takes down a random router, run `sudo python src/CLGen/TakeDownNodeTest.py`
 
 ## Current Progress
   * Scripts for configuring and running docker containers with quagga, able to speak BGP to each other.
   * Ability to input desired number of routers, distribution pattern/paremeters for number of networks initially advertised, and desired network topology (choice of mesh/hub).
   * API methods to introduce single-node failures and reverse them. (Taking down individual routers).
   * API method to report BGP routing table of routers.
+  * API method for link failures (NOT FUNCTIONAL - vtysh does not accept "neighbor *peer* shutdown" command).
 
 ## Planned Features
-* API for link failures.
 * Parsing, interpretation of full BGP logs.
 
 
