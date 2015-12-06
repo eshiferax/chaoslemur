@@ -13,8 +13,8 @@ os.chdir(dname)
 
 class CLMeshUniformTest(unittest.TestCase):
 
-    def testGenerateConfigsAndReturnContextMesh(self):
-        config_gen = cg.ChaosLemurConfigGenerator(4, "hub", "pareto")
+    def testGenerateConfigsAndReturnContextHubPareto(self):
+        config_gen = cg.ChaosLemurConfigGenerator(4, "hub", "pareto",2.3)
         config_gen.generateConfigsAndReturnContext()
 
 if __name__ == '__main__':

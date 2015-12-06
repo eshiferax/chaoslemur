@@ -11,10 +11,10 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-class CLMeshUniformTest(unittest.TestCase):
+class CLMeshParetoTest(unittest.TestCase):
 
-    def testGenerateConfigsAndReturnContextMesh(self):
-        config_gen = cg.ChaosLemurConfigGenerator(4, "mesh", "pareto")
+    def testGenerateConfigsAndReturnContextMeshPareto(self):
+        config_gen = cg.ChaosLemurConfigGenerator(4, "mesh", "pareto",2.3)
         config_gen.generateConfigsAndReturnContext()
 
 if __name__ == '__main__':

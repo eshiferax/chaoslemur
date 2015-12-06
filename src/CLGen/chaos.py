@@ -11,6 +11,7 @@ import subprocess
 import datetime
 import random
 import os
+import chaosgen as cg
 
 class ChaosLemur:
 
@@ -24,28 +25,26 @@ class ChaosLemur:
         self.num_routers = len(self.names)
 
     ###
-    # Load names of routers, written to file by ChaosLemurConfigGenerator
-    ###
-    def loadNames(self, path):
-      # Get portion of conf template listing router IP, neighbor
-        with open ("names.txt", "r") as tfile:
-            self.names = tfile.readlines()       
-    ###
     # Take down Node
     ###
     def takeDownNode(self, num):
-        name_rt = names[num]
+        name_rt = self.names[num]
         tdCommand = "sudo docker stop %s" % (name_rt)
         os.system(tdCommand)
-       
-        failure_event = ChaosLemurEvent("Node Failure %s" & (num), datetime.datetime.now(), num) 
+        
+        failure_event = ChaosLemurEvent("Node Failure %s" % (num), datetime.datetime.now(), num) 
         self.event_list.append(failure_event)
 
     ###
     # Take down link
     ###
     def takeDownLink(self, rt1, rt2):
-        # TODO: Implement
+        rt_name = self.names[rt_1]
+        rt2_address = cg.ChaosLemurConfigGenerator.addressString("172.17.0.0", rt2)
+        show_ip_route_command = "sudo docker exec -i %s sh -c 'echo \"neighbor %s shutdown\" | vtysh'" % (rt_name, rt2_address)
+        os.system(show_ip_route_command)
+
+        failure_event = ChaosLemurEvent("Link Failure %s and %s" % (rt1, rt2), datetime.datetime.now(), (rt1, rt2))
         print "Link Failure %s and %s" % (rt1, rt2)
 
     ###
@@ -55,7 +54,7 @@ class ChaosLemur:
         
         for event in self.event_list:
             if "Failure" in event.event_type:
-                recover_command = "sudo docker start quag%s" % (event.num)
+                recover_command = "sudo docker start " + self.names[event.num]
                 os.system(recover_command)
                 print "Reversing failure for node %s" % (event.num)
         
@@ -63,21 +62,22 @@ class ChaosLemur:
         self.event_list.append(recovery_event)
 
     ###
-    # Take down RANDOM node
+    # Take down RANDOM node. Return ID of node failed.
     ###
     def takeDownRandomNode(self):
         
-        node_to_fail = random.randint(0, self.num_routers)
+        node_to_fail = random.randint(0, self.num_routers - 1)
         self.takeDownNode(node_to_fail)
+        return node_to_fail
 
     ###
-    # Take down RANDOM link
+    # Take down RANDOM link. Return ID of link failed.
     ###
     def takeDownRandomLink(self):
-        link_to_fail_node1 = random.randint(0, self.num_routers)
-        link_to_fail_node2 = range(0,self.num_routers).remove(link_to_fail_node1)[random.randint(0, num_routers-1)]
+        link_to_fail_node1 = random.randint(0, self.num_routers - 1)
+        link_to_fail_node2 = range(0,self.num_routers).remove(link_to_fail_node1)[random.randint(0, num_routers-2)]
         self.takeDownLink(link_to_fail_node1, link_to_fail_node2)
-
+        return (link_to_fail_node1, link_to_fail_node2)
     ###
     # Display prefixes loaded for router X
     ###
@@ -86,7 +86,15 @@ class ChaosLemur:
         show_ip_route_command = "sudo docker exec -i %s sh -c 'echo \"show ip route\" | vtysh'" % (rt_name)
         os.system(show_ip_route_command)
     
-
+    ###
+    # Display prefixes loaded for ANY router that is still running
+    ###
+    def showAliveIPRoute(self, dead_one):
+        rt_num = random.randint(0, len(self.names)-1)
+        while rt_num == dead_one:
+            rt_num = random.randint(0, len(self.names)-1)
+        self.showIPRoute(rt_num)
+        
 class ChaosLemurEvent:
 
     def __init__(self, typ, time, number):
