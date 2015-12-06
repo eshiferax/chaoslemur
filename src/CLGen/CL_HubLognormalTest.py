@@ -14,7 +14,7 @@ os.chdir(dname)
 class CLMeshUniformTest(unittest.TestCase):
 
     def testGenerateConfigsAndReturnContextMesh(self):
-        config_gen = cg.ChaosLemurConfigGenerator(4, "mesh", "uniform")
+        config_gen = cg.ChaosLemurConfigGenerator(4, "hub", "lognormal")
         config_gen.generateConfigsAndReturnContext()
 
 if __name__ == '__main__':

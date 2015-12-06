@@ -160,7 +160,7 @@ class ChaosLemurConfigGenerator:
     ###
     @staticmethod
     def buildTopologyPortionHub(num, curr, subnet, hub_num):
-        ##TODO: Implement
+        
         if(curr == hub_num):
             all_except_me = range(2, num+2)
             all_except_me.remove(curr+1)
