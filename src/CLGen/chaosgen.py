@@ -20,7 +20,7 @@ class ChaosLemurConfigGenerator:
       
     DEFAULT_AS = 7675
     def __init__(self, num_routers, topology, net_distrib, dist_param_1=1, dist_param_2=10):
-        # TODO: Take input for choice of "distribution" of number of networks
+        # Take input for choice of "distribution" of number of networks
         self.num_routers = num_routers
         self.topology = topology
         self.distribution = net_distrib
@@ -246,6 +246,8 @@ class ChaosLemurContextGenerator:
             runCommand = "sudo docker run --privileged -it -d quag%s" % (i)
             os.system(buildCommand)
             os.system(runCommand)
+        
+        #getNodeNamesCommand = "sudo docker ps | awk '{print $14}' | sed '/^\s*$/d'"
     
 
 

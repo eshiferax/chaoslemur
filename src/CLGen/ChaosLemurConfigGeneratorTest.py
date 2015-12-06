@@ -1,5 +1,5 @@
 #!/bin/python
-#ChaosLemurGeneratorTest.py
+#ChaosLemurConfigGeneratorTest.py
 #Emmanuel Shiferaw
 #Davis Gossage
 
@@ -20,9 +20,9 @@ class ChaosLemurConfigGeneratorTest(unittest.TestCase):
     def testBuildTopologyPortionMesh(self):
         self.assertEqual(cg.ChaosLemurConfigGenerator.buildTopologyPortionMesh(4,2, "172.17.0.0"), ["neighbor 172.17.0.2 remote-as 7675\n", "neighbor 172.17.0.4 remote-as 7675\n", "neighbor 172.17.0.5 remote-as 7675\n"])            
 
-    def testGenerateConfigsAndReturnContextMesh(self):
-        config_gen = cg.ChaosLemurConfigGenerator(4, "mesh", "uniform")
-        config_gen.generateConfigsAndReturnContext()    
+    def testGetSubnets(self):
+        req_list = cg.ChaosLemurConfigGenerator.getSubnets(6)
+        self.assertEqual(6, len(req_list))
 
 if __name__ == '__main__':
     unittest.main()
